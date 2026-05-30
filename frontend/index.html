@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Inventory Agent</title>
+</head>
+
+<body>
+
+    <h1>Add Product</h1>
+
+    <input
+        type="text"
+        id="name"
+        placeholder="Product Name">
+
+    <br><br>
+
+    <input
+    type="number"
+    id="quantity"
+    min="1"
+    placeholder="Quantity">
+
+    <br><br>
+
+    <button onclick="addProduct()">
+        Add Product
+    </button>
+
+    <button onclick="loadProducts()">
+        Load Products
+    </button>
+
+    <button onclick="loadSales()">
+    Load Sales
+    </button>
+
+    <br><br>
+
+    <h2>Record Sale</h2>
+
+   <input
+    type="number"
+    id="productId"
+    min="1"
+    placeholder="Product ID">
+
+    <br><br>
+
+    <input
+    type="number"
+    id="quantitySold"
+    min="1"
+    placeholder="Quantity Sold">
+
+    <br><br>
+
+    <button onclick="recordSale()">
+        Record Sale
+    </button>
+
+    <br><br>
+
+    <ul id="productList"></ul>
+
+    <h2>Sales History</h2>
+
+    <ul id="salesList"></ul>
+
+    <script>
+
+        async function addProduct() {
+
+            const productName =
+                document.getElementById("name").value
+
+            const productQuantity =
+                document.getElementById("quantity").value
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/products",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJTaXJpIiwiZXhwIjoxNzgwMTMzMjg2fQ.V4euMkepcof-T6m2O0QRuKGNlO0_DnpIBpTRXvTkJtY"
+                    },
+
+                    body: JSON.stringify({
+                        name: productName,
+                        quantity: Number(productQuantity)
+                    })
+                }
+            )
+
+            const data = await response.json()
+
+            console.log(data)
+
+            alert(data.message)
+            loadProducts()
+        }
+
+        async function loadProducts() {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/products"
+            )
+
+            const data = await response.json()
+
+            console.log(data)
+
+            const productList =
+                document.getElementById("productList")
+
+            productList.innerHTML = ""
+
+            data.products.forEach(product => {
+
+                const li =
+                    document.createElement("li")
+
+                li.innerText =
+                    `ID: ${product.id} | ${product.name} - ${product.quantity}`
+
+                productList.appendChild(li)
+
+            })
+        }
+
+        async function recordSale() {
+
+            const productId =
+                document.getElementById("productId").value
+
+            const quantitySold =
+                document.getElementById("quantitySold").value
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/sales",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        product_id: Number(productId),
+                        quantity_sold: Number(quantitySold)
+                    })
+                }
+            )
+
+            const data = await response.json()
+
+            console.log(data)
+
+            alert(data.message)
+            loadProducts()
+        }
+        async function loadSales() {
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/sales"
+    )
+
+    const data = await response.json()
+
+    console.log(data)
+
+    const salesList =
+        document.getElementById("salesList")
+
+    salesList.innerHTML = ""
+
+    data.sales.forEach(sale => {
+
+        const li =
+            document.createElement("li")
+
+        li.innerText =
+            `Sale ID: ${sale.id} | ${sale.product_name} | Sold: ${sale.quantity_sold}`
+
+        salesList.appendChild(li)
+
+    })
+
+    }
+    </script>
+
+</body>
+
+</html>

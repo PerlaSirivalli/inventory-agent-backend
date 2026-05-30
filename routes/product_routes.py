@@ -34,6 +34,25 @@ def add_product(
 
     db: Session = SessionLocal()
 
+    if product.quantity <= 0:
+        return {
+            "message": "Quantity must be greater than 0"
+        }
+
+    existing_product = db.query(ProductDB).filter(
+        ProductDB.name == product.name
+    ).first()
+
+    if existing_product:
+
+        existing_product.quantity += product.quantity
+
+        db.commit()
+
+        return {
+            "message": "Product quantity updated"
+        }
+
     new_product = ProductDB(
         name=product.name,
         quantity=product.quantity
@@ -213,4 +232,25 @@ def delete_product(
 
     return {
         "message": "Product deleted successfully"
+    }
+
+@router.get("/sales")
+def get_sales():
+
+    db: Session = SessionLocal()
+
+    sales = db.query(SaleDB).all()
+
+    result = []
+
+    for sale in sales:
+
+        result.append({
+            "id": sale.id,
+            "product_name": sale.product.name if sale.product else "Deleted Product",
+            "quantity_sold": sale.quantity_sold
+        })
+
+    return {
+        "sales": result
     }

@@ -12,7 +12,10 @@ class ProductDB(Base):
 
     quantity = Column(Integer)
 
-    sales = relationship("SaleDB")
+    sales = relationship(
+    "SaleDB",
+    back_populates="product"
+    )
 
 class UserDB(Base):
 
@@ -36,3 +39,8 @@ class SaleDB(Base):
     )
 
     quantity_sold = Column(Integer)
+    
+    product = relationship(
+    "ProductDB",
+    back_populates="sales"
+    )
